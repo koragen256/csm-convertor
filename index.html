@@ -100,6 +100,8 @@
     からjson式に変換してきてください<br>
     <br>
     <input type="file" id="finp" onchange="butotnClick()"><span id="finpl"></span>
+    <br>
+    <textarea name="resultt" id="" cols="30" rows="6" hidden=true></textarea>
   </div>
   <br>
   <div class="box">
@@ -108,12 +110,20 @@
     scale<br>
     <input type="number" id="mag" value="100" min="1" max="1000">
     %<br>
+
+    <br><br>
+    入力入れ替え:<br>
+    X input to <input type="text" name="inputx" value="x"><br>
+    Y input to <input type="text" name="inputy" value="y"><br>
+    Z input to <input type="text" name="inputz" value="z"><br>
+
     <br>
 
     mode<br>
     <form name="formChecker">
-    <label><input type="radio" name="rbtn" value="1">CSM</label><br>
-    <label><input type="radio" name="rbtn" value="2">skin</label><br>
+    <label><input type="radio" name="rbtn" value="1">beadlock model</label><br>
+    <label><input type="radio" name="rbtn" value="2">skin txt</label><br>
+    <label><input type="radio" name="rbtn" value="3">statue data</label><br>
     </form>
 
     <br>
@@ -163,7 +173,21 @@
 
     reader.onload = function () {
       console.log(reader.result);
-      alert("fin load!")
+      alert("fin load!");
+
+      var infoarea =document.getElementsByName("resultt")[0];
+
+      infoarea.value='name: ' + file.name+"\n";
+      infoarea.value+='size: ' + file.size+"\n";
+      infoarea.value+='type: ' + file.type+"\n";
+
+      const jsonObject = JSON.parse(reader.result);
+      infoarea.value+='voxels count: ' + jsonObject["voxels"].length+"\n";
+      infoarea.value+='width: ' + jsonObject["dimension"][0]["width"]+"\n";
+      infoarea.value+='height: ' + jsonObject["dimension"][0]["height"]+"\n";
+      infoarea.value+='depth: ' + jsonObject["dimension"][0]["depth"]+"\n";
+
+      infoarea.hidden=false;
       //document.getElementsByName("resultext")[0].value=reader.result;
       //document.getElementsByName("resultext").value=reader.result;
     }
@@ -329,6 +353,7 @@
   function convert2(jsondata, mag,data) {
     console.log(jsondata);
     
+
     for (let t of jsondata["voxels"]) {
       //cubes.push({ "origin": [(t["x"] - jsondata["dimension"][0]["width"] / 2) * mag, (t["y"]) * mag, (t["z"] - jsondata["dimension"][0]["depth"] / 2) * mag], "size": [1 * mag, 1 * mag, 1 * mag], "uv": [0, 0] });
 
@@ -398,10 +423,61 @@
 
   }
 
+  function convertTostadata(jsondata) {
+    console.log(jsondata);
+
+    let buffer = new ArrayBuffer(0x20+jsondata["voxels"].length*6);
+
+    let dv = new DataView(buffer);
+
+    dv.setUint16(0, 10);
+    dv.setUint16(2, 11);
+    console.log(buffer);
+
+    jsondata["voxels"].sort(function(a,b){
+        if( Number(a["x"]) > Number(b["x"]) ) return -1;
+        if( Number(a["x"]) < Number(b["x"]) ) return 1;
+        return 0;
+    })
+
+    jsondata["voxels"].sort(function(a,b){
+        if( Number(a["y"]) > Number(b["y"]) ) return -1;
+        if( Number(a["y"]) < Number(b["y"]) ) return 1;
+        return 0;
+    })
+
+    dv.setUint32(0x4,jsondata["voxels"].length);
+
+    for (let i=0;i<jsondata["voxels"].length;i++) {
+
+      dv.setUint16(0x20+i*6, Number(jsondata["voxels"][i][document.getElementsByName("inputx")[0].value]));
+      dv.setUint16(0x22+i*6, Number(jsondata["voxels"][i][document.getElementsByName("inputy")[0].value]));
+      dv.setUint16(0x24+i*6, Number(jsondata["voxels"][i][document.getElementsByName("inputz")[0].value]));
+    }
+
+    var a = document.createElement("a");
+    document.body.appendChild(a);
+    a.style = "display: none";
+    console.log(a);
+
+
+    console.log(jsondata["voxels"].length);
+
+    var blob = new Blob([buffer], {type: "octet/stream"}),
+    url = window.URL.createObjectURL(blob);
+    console.log(url);
+
+    //データを保存する
+    a.href = url;
+    a.download = finp.files[0].name+"_statuedata.bin";
+    a.click();
+    window.URL.revokeObjectURL(url);
+
+  }
 
   function RUNbutton() {
     var rcheck = document.formChecker.rbtn[0].checked; //ラジオボタンrbtnの１つ目（rbtn[0]）の状態を取得
-    if (rcheck) {
+    if (document.formChecker.rbtn[0].checked) {
       console.log("start convert");
 
       const reader = new FileReader();
@@ -414,7 +490,7 @@
         console.log(mag.value / 100);
         convert3(jsonObject, Number(mag.value / 100));
       }
-    }else{
+    }else if(document.formChecker.rbtn[1].checked){
       console.log("start convert2");
 
       const reader = new FileReader();
@@ -436,7 +512,34 @@
 
 
         console.log(data)
-        convert4(jsonObject, Number(mag.value / 100),data);
+        convert2(jsonObject, Number(mag.value / 100),data);
+        //convertTostadata(jsonObject);
+      }
+      
+    }else if(document.formChecker.rbtn[2].checked){
+      console.log("start convert2");
+
+      const reader = new FileReader();
+      let file = finp.files[0];
+      reader.readAsText(file);
+
+      reader.onload = function () {
+        console.log(reader.result);
+        const jsonObject = JSON.parse(reader.result);
+        console.log(mag.value / 100);
+        let data ="";
+        
+        data+="DISPLAYNAME:"+document.getElementsByName("DISPLAYNAME")[0].value+"\n";
+        data+="DISPLAYNAMEID:IDS_dlcskin"+document.getElementsByName("DISPLAYNAMEID")[0].value+"_DISPLAYNAME\n";
+        data+="THEMENAME:"+document.getElementsByName("THEMENAME")[0].value+"\n";
+        data+="GAME_FLAGS:"+document.getElementsByName("GAME_FLAGS")[0].value+"\n";
+        data+="FREE:"+document.getElementsByName("FREE")[0].value+"\n";
+        data+="ANIM:"+document.getElementsByName("ANIM")[0].value+"\n";
+
+
+        console.log(data)
+        //convert2(jsonObject, Number(mag.value / 100),data);
+        convertTostadata(jsonObject);
       }
     }
 
