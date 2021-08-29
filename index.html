@@ -121,9 +121,9 @@
 
     mode<br>
     <form name="formChecker">
-    <label><input type="radio" name="rbtn" value="1">beadlock model</label><br>
-    <label><input type="radio" name="rbtn" value="2">skin txt</label><br>
-    <label><input type="radio" name="rbtn" value="3">statue data</label><br>
+      <label><input type="radio" name="rbtn" value="1">beadlock model</label><br>
+      <label><input type="radio" name="rbtn" value="2">skin txt</label><br>
+      <label><input type="radio" name="rbtn" value="3">statue data</label><br>
     </form>
 
     <br>
@@ -139,7 +139,7 @@
     <input type="text" name="DISPLAYNAME" id="">
     <br><br>
     DISPLAYNAMEID:<br>
-    <input type="text" name="DISPLAYNAMEID" id=""value="00000000">
+    <input type="text" name="DISPLAYNAMEID" id="" value="00000000">
     <br><br>
     THEMENAME:<br>
     <input type="text" name="THEMENAME" id="">
@@ -151,10 +151,10 @@
     <input type="text" name="FREE" id="" value="1">
     <br><br>
     ANIM:<br>
-    <input type="text" name="ANIM" id=""value="0x7ff5fc10">
-    
-    
-    
+    <input type="text" name="ANIM" id="" value="0x7ff5fc10">
+
+
+
   </div>
 
 </body>
@@ -175,19 +175,19 @@
       console.log(reader.result);
       alert("fin load!");
 
-      var infoarea =document.getElementsByName("resultt")[0];
+      var infoarea = document.getElementsByName("resultt")[0];
 
-      infoarea.value='name: ' + file.name+"\n";
-      infoarea.value+='size: ' + file.size+"\n";
-      infoarea.value+='type: ' + file.type+"\n";
+      infoarea.value = 'name: ' + file.name + "\n";
+      infoarea.value += 'size: ' + file.size + "\n";
+      infoarea.value += 'type: ' + file.type + "\n";
 
       const jsonObject = JSON.parse(reader.result);
-      infoarea.value+='voxels count: ' + jsonObject["voxels"].length+"\n";
-      infoarea.value+='width: ' + jsonObject["dimension"][0]["width"]+"\n";
-      infoarea.value+='height: ' + jsonObject["dimension"][0]["height"]+"\n";
-      infoarea.value+='depth: ' + jsonObject["dimension"][0]["depth"]+"\n";
+      infoarea.value += 'voxels count: ' + jsonObject["voxels"].length + "\n";
+      infoarea.value += 'width: ' + jsonObject["dimension"][0]["width"] + "\n";
+      infoarea.value += 'height: ' + jsonObject["dimension"][0]["height"] + "\n";
+      infoarea.value += 'depth: ' + jsonObject["dimension"][0]["depth"] + "\n";
 
-      infoarea.hidden=false;
+      infoarea.hidden = false;
       //document.getElementsByName("resultext")[0].value=reader.result;
       //document.getElementsByName("resultext").value=reader.result;
     }
@@ -265,39 +265,39 @@
         }
       ]
     }
-    
-    let width=Number(jsondata["dimension"][0]["width"])+1;
-    let height=Number(jsondata["dimension"][0]["height"])+1;
-    let depth=Number(jsondata["dimension"][0]["depth"])+1;
 
-    let xyzDspace = [...Array(width)].map(k=>[...Array(height)].map(k=>[...Array(depth)].map(k=>0)));
+    let width = Number(jsondata["dimension"][0]["width"]) + 1;
+    let height = Number(jsondata["dimension"][0]["height"]) + 1;
+    let depth = Number(jsondata["dimension"][0]["depth"]) + 1;
+
+    let xyzDspace = [...Array(width)].map(k => [...Array(height)].map(k => [...Array(depth)].map(k => 0)));
     console.log(xyzDspace);
- 
+
     for (let t of jsondata["voxels"]) {
       //console.log(t["x"]+","+t["y"]+","+t["z"]);
-      xyzDspace[Number(t["x"])][Number(t["y"])][Number(t["z"])]=1;
+      xyzDspace[Number(t["x"])][Number(t["y"])][Number(t["z"])] = 1;
     }
 
     var cubes = [];
 
-    var pulesscounts=[];
-    for (let ix=0;ix<width;ix++){
-      for (let iy=0;iy<height;iy++){
-        for (let iz=0;iz<depth;iz++){
-          if(xyzDspace[ix][iy][iz]==0)continue
-          let t = getvestV(xyzDspace,ix,iy,iz,width,height,depth);
-          for(let i=0;i<t[0];i++){
-            xyzDspace[ix+t[1][0]*(i+1)][iy+t[1][1]*(i+1)][iz+t[1][2]*(i+1)]=0;
+    var pulesscounts = [];
+    for (let ix = 0; ix < width; ix++) {
+      for (let iy = 0; iy < height; iy++) {
+        for (let iz = 0; iz < depth; iz++) {
+          if (xyzDspace[ix][iy][iz] == 0) continue
+          let t = getvestV(xyzDspace, ix, iy, iz, width, height, depth);
+          for (let i = 0; i < t[0]; i++) {
+            xyzDspace[ix + t[1][0] * (i + 1)][iy + t[1][1] * (i + 1)][iz + t[1][2] * (i + 1)] = 0;
           }
           pulesscounts.push(t[0]);
-          cubes.push({"origin":[ix*mag,iy*mag,iz*mag], "size": [1+t[1][0]*t[0]*mag, 1+t[1][1]*t[0]*mag, 1+t[1][2]*t[0]*mag], "uv": [0, 0] })
+          cubes.push({ "origin": [ix * mag, iy * mag, iz * mag], "size": [1 + t[1][0] * t[0] * mag, 1 + t[1][1] * t[0] * mag, 1 + t[1][2] * t[0] * mag], "uv": [0, 0] })
         }
       }
     }
-    pulesscounts.sort(function(a,b){
-        if( a > b ) return -1;
-        if( a < b ) return 1;
-        return 0;
+    pulesscounts.sort(function (a, b) {
+      if (a > b) return -1;
+      if (a < b) return 1;
+      return 0;
     })
     console.log(pulesscounts);
     console.log(cubes);
@@ -318,46 +318,46 @@
 
   }
 
-  function getvestV(xyzDspace,x,y,z,w,h,d){
+  function getvestV(xyzDspace, x, y, z, w, h, d) {
     let vecs = [
-      [1,0,0],
-      [-1,0,0],
-      [0,1,0],
-      [0,-1,0],
-      [0,0,1],
-      [0,0,-1]
+      [1, 0, 0],
+      [-1, 0, 0],
+      [0, 1, 0],
+      [0, -1, 0],
+      [0, 0, 1],
+      [0, 0, -1]
     ]
-    let lens=[];
-    for(let t of vecs){
-      lens.push([getVlength(xyzDspace,x,y,z,t[0],t[1],t[2],w,h,d),t]);
+    let lens = [];
+    for (let t of vecs) {
+      lens.push([getVlength(xyzDspace, x, y, z, t[0], t[1], t[2], w, h, d), t]);
     }
-    lens.sort(function(a,b){
-        if( a > b ) return -1;
-        if( a < b ) return 1;
-        return 0;
+    lens.sort(function (a, b) {
+      if (a > b) return -1;
+      if (a < b) return 1;
+      return 0;
     })
     return lens[0];
   }
 
-  function getVlength(xyzDspace,x,y,z,xv,yv,zv,w,h,d){
-    let t=0;
-    while(w>x&&h>y&&d>z&&0<=x&&0<=y&&0<=z&&xyzDspace[x][y][z]==1){
+  function getVlength(xyzDspace, x, y, z, xv, yv, zv, w, h, d) {
+    let t = 0;
+    while (w > x && h > y && d > z && 0 <= x && 0 <= y && 0 <= z && xyzDspace[x][y][z] == 1) {
       t++;
-      x+=xv;
-      y+=yv;
-      z+=zv;
+      x += xv;
+      y += yv;
+      z += zv;
     }
-    return t-1;
+    return t - 1;
   }
 
-  function convert2(jsondata, mag,data) {
+  function convert2(jsondata, mag, data) {
     console.log(jsondata);
-    
+
 
     for (let t of jsondata["voxels"]) {
       //cubes.push({ "origin": [(t["x"] - jsondata["dimension"][0]["width"] / 2) * mag, (t["y"]) * mag, (t["z"] - jsondata["dimension"][0]["depth"] / 2) * mag], "size": [1 * mag, 1 * mag, 1 * mag], "uv": [0, 0] });
 
-      data+="BOX:BODY "+(t["x"] - jsondata["dimension"][0]["width"] / 2) * mag+ " " + (t["y"]) * -mag + " " +(t["z"] - jsondata["dimension"][0]["depth"] / 2) * mag+ " " +1 + " " +1 + " " +1 +" 0 0\n"
+      data += "BOX:BODY " + (t["x"] - jsondata["dimension"][0]["width"] / 2) * mag + " " + (t["y"]) * -mag + " " + (t["z"] - jsondata["dimension"][0]["depth"] / 2) * mag + " " + 1 + " " + 1 + " " + 1 + " 0 0\n"
     }
 
     //tempdata["minecraft:geometry"][0]["bones"][0]["cubes"] = cubes;
@@ -370,47 +370,47 @@
     let blob = new Blob([data], { type: "text/plain" });
     let link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = "dlcskin"+document.getElementsByName("DISPLAYNAMEID")[0].value+'.png.txt';
+    link.download = "dlcskin" + document.getElementsByName("DISPLAYNAMEID")[0].value + '.png.txt';
     link.click();
   }
 
-  function convert4(jsondata, mag,data) {
+  function convert4(jsondata, mag, data) {
     console.log(jsondata);
 
-    let width=Number(jsondata["dimension"][0]["width"])+1;
-    let height=Number(jsondata["dimension"][0]["height"])+1;
-    let depth=Number(jsondata["dimension"][0]["depth"])+1;
+    let width = Number(jsondata["dimension"][0]["width"]) + 1;
+    let height = Number(jsondata["dimension"][0]["height"]) + 1;
+    let depth = Number(jsondata["dimension"][0]["depth"]) + 1;
 
-    let xyzDspace = [...Array(width)].map(k=>[...Array(height)].map(k=>[...Array(depth)].map(k=>0)));
+    let xyzDspace = [...Array(width)].map(k => [...Array(height)].map(k => [...Array(depth)].map(k => 0)));
     console.log(xyzDspace);
- 
+
     for (let t of jsondata["voxels"]) {
       //console.log(t["x"]+","+t["y"]+","+t["z"]);
-      xyzDspace[Number(t["x"])][Number(t["y"])][Number(t["z"])]=1;
+      xyzDspace[Number(t["x"])][Number(t["y"])][Number(t["z"])] = 1;
     }
 
     var cubes = [];
 
-    var pulesscounts=[];
-    for (let ix=0;ix<width;ix++){
-      for (let iy=0;iy<height;iy++){
-        for (let iz=0;iz<depth;iz++){
-          if(xyzDspace[ix][iy][iz]==0)continue
-          let t = getvestV(xyzDspace,ix,iy,iz,width,height,depth);
-          for(let i=0;i<t[0];i++){
-            xyzDspace[ix+t[1][0]*(i+1)][iy+t[1][1]*(i+1)][iz+t[1][2]*(i+1)]=0;
+    var pulesscounts = [];
+    for (let ix = 0; ix < width; ix++) {
+      for (let iy = 0; iy < height; iy++) {
+        for (let iz = 0; iz < depth; iz++) {
+          if (xyzDspace[ix][iy][iz] == 0) continue
+          let t = getvestV(xyzDspace, ix, iy, iz, width, height, depth);
+          for (let i = 0; i < t[0]; i++) {
+            xyzDspace[ix + t[1][0] * (i + 1)][iy + t[1][1] * (i + 1)][iz + t[1][2] * (i + 1)] = 0;
           }
           pulesscounts.push(t[0]);
-          cubes.push({"origin":[ix*mag,iy*mag,iz*mag], "size": [1+t[1][0]*t[0]*mag, 1+t[1][1]*t[0]*mag, 1+t[1][2]*t[0]*mag], "uv": [0, 0] })
-          data+="BOX:BODY "+(ix-width/2) * mag+ " " + (iy) * -mag + " " +(iz-depth/2) * mag+ " " +(1+t[1][0]*t[0]*mag) + " " +(1+t[1][1]*t[0]*mag) + " " +(1+t[1][2]*t[0]*mag) +" 0 0\n"
+          cubes.push({ "origin": [ix * mag, iy * mag, iz * mag], "size": [1 + t[1][0] * t[0] * mag, 1 + t[1][1] * t[0] * mag, 1 + t[1][2] * t[0] * mag], "uv": [0, 0] })
+          data += "BOX:BODY " + (ix - width / 2) * mag + " " + (iy) * -mag + " " + (iz - depth / 2) * mag + " " + (1 + t[1][0] * t[0] * mag) + " " + (1 + t[1][1] * t[0] * mag) + " " + (1 + t[1][2] * t[0] * mag) + " 0 0\n"
         }
       }
     }
 
-    pulesscounts.sort(function(a,b){
-        if( a > b ) return -1;
-        if( a < b ) return 1;
-        return 0;
+    pulesscounts.sort(function (a, b) {
+      if (a > b) return -1;
+      if (a < b) return 1;
+      return 0;
     })
     console.log(pulesscounts);
     console.log(cubes);
@@ -418,7 +418,7 @@
     let blob = new Blob([data], { type: "text/plain" });
     let link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = "dlcskin"+document.getElementsByName("DISPLAYNAMEID")[0].value+'.png.txt';
+    link.download = "dlcskin" + document.getElementsByName("DISPLAYNAMEID")[0].value + '.png.txt';
     link.click();
 
   }
@@ -426,31 +426,31 @@
   function convertTostadata(jsondata) {
     console.log(jsondata);
 
-    let buffer = new ArrayBuffer(0x20+jsondata["voxels"].length*6);
+    let buffer = new ArrayBuffer(0x20 + jsondata["voxels"].length * 6);
 
     let dv = new DataView(buffer);
 
     console.log(buffer);
 
-    jsondata["voxels"].sort(function(a,b){
-        if( Number(a["x"]) > Number(b["x"]) ) return -1;
-        if( Number(a["x"]) < Number(b["x"]) ) return 1;
-        return 0;
+    jsondata["voxels"].sort(function (a, b) {
+      if (Number(a["x"]) > Number(b["x"])) return -1;
+      if (Number(a["x"]) < Number(b["x"])) return 1;
+      return 0;
     })
 
-    jsondata["voxels"].sort(function(a,b){
-        if( Number(a["y"]) > Number(b["y"]) ) return -1;
-        if( Number(a["y"]) < Number(b["y"]) ) return 1;
-        return 0;
+    jsondata["voxels"].sort(function (a, b) {
+      if (Number(a["y"]) > Number(b["y"])) return -1;
+      if (Number(a["y"]) < Number(b["y"])) return 1;
+      return 0;
     })
 
-    dv.setUint32(0x4,jsondata["voxels"].length);
+    dv.setUint32(0x4, jsondata["voxels"].length);
 
-    for (let i=0;i<jsondata["voxels"].length;i++) {
+    for (let i = 0; i < jsondata["voxels"].length; i++) {
 
-      dv.setUint16(0x20+i*6, Number(jsondata["voxels"][i][document.getElementsByName("inputx")[0].value]));
-      dv.setUint16(0x22+i*6, Number(jsondata["voxels"][i][document.getElementsByName("inputy")[0].value]));
-      dv.setUint16(0x24+i*6, Number(jsondata["voxels"][i][document.getElementsByName("inputz")[0].value]));
+      dv.setUint16(0x20 + i * 6, Number(jsondata["voxels"][i][document.getElementsByName("inputx")[0].value]));
+      dv.setUint16(0x22 + i * 6, Number(jsondata["voxels"][i][document.getElementsByName("inputy")[0].value]));
+      dv.setUint16(0x24 + i * 6, Number(jsondata["voxels"][i][document.getElementsByName("inputz")[0].value]));
     }
 
     var a = document.createElement("a");
@@ -461,13 +461,99 @@
 
     console.log(jsondata["voxels"].length);
 
-    var blob = new Blob([buffer], {type: "octet/stream"}),
-    url = window.URL.createObjectURL(blob);
+    var blob = new Blob([buffer], { type: "octet/stream" }),
+      url = window.URL.createObjectURL(blob);
     console.log(url);
 
     //データを保存する
     a.href = url;
-    a.download = finp.files[0].name+"_statuedata.bin";
+    a.download = finp.files[0].name + "_statuedata.bin";
+    a.click();
+    window.URL.revokeObjectURL(url);
+
+  }
+
+  function convertTostadata2(jsondata) {
+    console.log(jsondata);
+
+    let width = Number(jsondata["dimension"][0]["width"]) + 1;
+    let height = Number(jsondata["dimension"][0]["height"]) + 1;
+    let depth = Number(jsondata["dimension"][0]["depth"]) + 1;
+
+    let xyzDspace = [...Array(width)].map(k => [...Array(height)].map(k => [...Array(depth)].map(k => 0)));
+
+    for (let t of jsondata["voxels"]) {
+      //console.log(t["x"]+","+t["y"]+","+t["z"]);
+      xyzDspace[Number(t["x"])][Number(t["y"])][Number(t["z"])] = 1;
+    }
+
+    let vecs = [
+      [1, 0, 0],
+      [-1, 0, 0],
+      [0, 1, 0],
+      [0, -1, 0],
+      [0, 0, 1],
+      [0, 0, -1]
+    ]
+
+    console.log(xyzDspace);
+    let poslist = [];
+    for (let ix = 0; ix < width; ix++) {
+      for (let iy = 0; iy < height; iy++) {
+        for (let iz = 0; iz < depth; iz++) {
+          if (xyzDspace[ix][iy][iz] == 0) continue
+
+          let cou = 0;
+          if (ix - 1 > 0 && iy - 1 > 0 && iz - 1 > 0 && ix + 1 < width && iy + 1 < height && iz + 1 < depth) {
+            for (let t of vecs) {
+              if (xyzDspace[ix + t[0]][iy + t[1]][iz + t[2]] != 0) cou++;
+            }
+          }
+
+          if (cou == 6) {
+            xyzDspace[ix][iy][iz] = 2;
+          }
+
+          if (xyzDspace[ix][iy][iz] == 1) {
+            poslist.push([ix, iy, iz]);
+          }
+        }
+      }
+    }
+
+    let buffer = new ArrayBuffer(0x20 + poslist.length * 6);
+
+    let dv = new DataView(buffer);
+    poslist.sort(function (a, b) {
+      if (a[0]**2+a[1]**2+a[2]**2 > b[0]**2+b[1]**2+b[2]**2) return 1;
+      if (a[0]**2+a[1]**2+a[2]**2 < b[0]**2+b[1]**2+b[2]**2) return -1;
+      return 0;
+    })
+    console.log(poslist.length);
+
+    dv.setUint32(0x4, poslist.length);
+
+    for (let i = 0; i < poslist.length; i++) {
+      dv.setUint16(0x20 + i * 6, poslist[i][0]);
+      dv.setUint16(0x22 + i * 6, poslist[i][1]);
+      dv.setUint16(0x24 + i * 6, poslist[i][2]);
+    }
+
+    var a = document.createElement("a");
+    document.body.appendChild(a);
+    a.style = "display: none";
+    console.log(a);
+
+
+    console.log(jsondata["voxels"].length);
+
+    var blob = new Blob([buffer], { type: "octet/stream" }),
+      url = window.URL.createObjectURL(blob);
+    console.log(url);
+
+    //データを保存する
+    a.href = url;
+    a.download = finp.files[0].name + "_statuedata.bin";
     a.click();
     window.URL.revokeObjectURL(url);
 
@@ -488,7 +574,7 @@
         console.log(mag.value / 100);
         convert3(jsonObject, Number(mag.value / 100));
       }
-    }else if(document.formChecker.rbtn[1].checked){
+    } else if (document.formChecker.rbtn[1].checked) {
       console.log("start convert2");
 
       const reader = new FileReader();
@@ -499,22 +585,22 @@
         console.log(reader.result);
         const jsonObject = JSON.parse(reader.result);
         console.log(mag.value / 100);
-        let data ="";
-        
-        data+="DISPLAYNAME:"+document.getElementsByName("DISPLAYNAME")[0].value+"\n";
-        data+="DISPLAYNAMEID:IDS_dlcskin"+document.getElementsByName("DISPLAYNAMEID")[0].value+"_DISPLAYNAME\n";
-        data+="THEMENAME:"+document.getElementsByName("THEMENAME")[0].value+"\n";
-        data+="GAME_FLAGS:"+document.getElementsByName("GAME_FLAGS")[0].value+"\n";
-        data+="FREE:"+document.getElementsByName("FREE")[0].value+"\n";
-        data+="ANIM:"+document.getElementsByName("ANIM")[0].value+"\n";
+        let data = "";
+
+        data += "DISPLAYNAME:" + document.getElementsByName("DISPLAYNAME")[0].value + "\n";
+        data += "DISPLAYNAMEID:IDS_dlcskin" + document.getElementsByName("DISPLAYNAMEID")[0].value + "_DISPLAYNAME\n";
+        data += "THEMENAME:" + document.getElementsByName("THEMENAME")[0].value + "\n";
+        data += "GAME_FLAGS:" + document.getElementsByName("GAME_FLAGS")[0].value + "\n";
+        data += "FREE:" + document.getElementsByName("FREE")[0].value + "\n";
+        data += "ANIM:" + document.getElementsByName("ANIM")[0].value + "\n";
 
 
         console.log(data)
-        convert2(jsonObject, Number(mag.value / 100),data);
+        convert2(jsonObject, Number(mag.value / 100), data);
         //convertTostadata(jsonObject);
       }
-      
-    }else if(document.formChecker.rbtn[2].checked){
+
+    } else if (document.formChecker.rbtn[2].checked) {
       console.log("start convert2");
 
       const reader = new FileReader();
@@ -525,19 +611,19 @@
         console.log(reader.result);
         const jsonObject = JSON.parse(reader.result);
         console.log(mag.value / 100);
-        let data ="";
-        
-        data+="DISPLAYNAME:"+document.getElementsByName("DISPLAYNAME")[0].value+"\n";
-        data+="DISPLAYNAMEID:IDS_dlcskin"+document.getElementsByName("DISPLAYNAMEID")[0].value+"_DISPLAYNAME\n";
-        data+="THEMENAME:"+document.getElementsByName("THEMENAME")[0].value+"\n";
-        data+="GAME_FLAGS:"+document.getElementsByName("GAME_FLAGS")[0].value+"\n";
-        data+="FREE:"+document.getElementsByName("FREE")[0].value+"\n";
-        data+="ANIM:"+document.getElementsByName("ANIM")[0].value+"\n";
+        let data = "";
+
+        data += "DISPLAYNAME:" + document.getElementsByName("DISPLAYNAME")[0].value + "\n";
+        data += "DISPLAYNAMEID:IDS_dlcskin" + document.getElementsByName("DISPLAYNAMEID")[0].value + "_DISPLAYNAME\n";
+        data += "THEMENAME:" + document.getElementsByName("THEMENAME")[0].value + "\n";
+        data += "GAME_FLAGS:" + document.getElementsByName("GAME_FLAGS")[0].value + "\n";
+        data += "FREE:" + document.getElementsByName("FREE")[0].value + "\n";
+        data += "ANIM:" + document.getElementsByName("ANIM")[0].value + "\n";
 
 
         console.log(data)
         //convert2(jsonObject, Number(mag.value / 100),data);
-        convertTostadata(jsonObject);
+        convertTostadata2(jsonObject);
       }
     }
 
