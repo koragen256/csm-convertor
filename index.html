@@ -430,8 +430,6 @@
 
     let dv = new DataView(buffer);
 
-    dv.setUint16(0, 10);
-    dv.setUint16(2, 11);
     console.log(buffer);
 
     jsondata["voxels"].sort(function(a,b){
