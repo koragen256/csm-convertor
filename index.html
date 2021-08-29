@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<!-- saved from url=(0046)https://mcbeeringi.github.io/apps/mc/poly.html -->
+<html lang="en" dir="ltr">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <title>voxcell Convertor</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+</head>
+
+
+<body>
+  <style>
+    :root,
+    textarea,
+    input {
+      background-color: #222;
+      color: #fff;
+      font-family: menlo, monospace;
+    }
+
+    .box {
+      background-color: #333;
+      padding: 4px;
+      font-size: 13px;
+    }
+
+    a:link,
+    a:visited {
+      color: #aef;
+    }
+
+    a:link:hover {
+      color: #8af;
+    }
+
+    a:link:active {
+      color: #48f;
+    }
+
+    h1,
+    h2 {
+      margin: 4px;
+    }
+
+    textarea {
+      background-color: #0000;
+      line-height: 14px;
+      min-height: 92px;
+      max-height: 448px;
+      width: calc(100% - 8px);
+      overflow: scroll;
+      resize: vertical;
+    }
+
+    #log {
+      line-height: 14px;
+      max-height: 448px;
+      overflow: scroll;
+      background-color: #333;
+    }
+
+    input:not([type=radio]) {
+      background-color: #0000;
+      display: inline-block;
+      border: none;
+      border-bottom: 2px solid #888;
+      border-radius: 0;
+      min-width: 20em;
+      max-width: 100%;
+      outline: none;
+      transition: .2s;
+    }
+
+    input:not([type=radio]):focus {
+      border-bottom-color: #48fc;
+    }
+
+    .button {
+      background-color: #555;
+      padding: 80px;
+      border-radius: 40px;
+      user-select: none;
+      -webkit-user-select: none;
+      display: inline-block;
+    }
+
+    .button:active {
+      background-color: #48fc;
+    }
+  </style>
+
+
+  <h1>voxcell Convertor</h1>
+  <div class="box">
+    <h2>input</h2>
+    <br>
+    <a href="https://drububu.com/miscellaneous/voxelizer/index.html?out=jso">こ↑こ↓</a>
+    からjson式に変換してきてください<br>
+    <br>
+    <input type="file" id="finp" onchange="butotnClick()"><span id="finpl"></span>
+  </div>
+  <br>
+  <div class="box">
+    <h2>Setting</h2>
+    <br>
+    scale<br>
+    <input type="number" id="mag" value="100" min="1" max="1000">
+    %<br>
+    <br>
+
+    mode<br>
+    <form name="formChecker">
+    <label><input type="radio" name="rbtn" value="1">CSM</label><br>
+    <label><input type="radio" name="rbtn" value="2">skin</label><br>
+    </form>
+
+    <br>
+    <button onclick="RUNbutton()">RUN convert</button>
+
+  </div>
+  <br>
+  <div class="box">
+    <h2>skininfo</h2>
+    スキンのデータをそのまま書き出す場合に必要です
+    <br><br>
+    DISPLAYNAME:<br>
+    <input type="text" name="DISPLAYNAME" id="">
+    <br><br>
+    DISPLAYNAMEID:<br>
+    <input type="text" name="DISPLAYNAMEID" id=""value="00000000">
+    <br><br>
+    THEMENAME:<br>
+    <input type="text" name="THEMENAME" id="">
+    <br><br>
+    GAME_FLAGS:<br>
+    <input type="text" name="GAME_FLAGS" id="" value="0x18">
+    <br><br>
+    FREE:<br>
+    <input type="text" name="FREE" id="" value="1">
+    <br><br>
+    ANIM:<br>
+    <input type="text" name="ANIM" id=""value="0x7ff5fc10">
+    
+    
+    
+  </div>
+
+</body>
+
+<script>
+  function butotnClick() {
+    console.log('value: ' + finp.value);
+    let file = finp.files[0];
+
+    console.log('name: ' + file.name);
+    console.log('size: ' + file.size);
+    console.log('type: ' + file.type);
+
+    const reader = new FileReader();
+    reader.readAsText(file);
+
+    reader.onload = function () {
+      console.log(reader.result);
+      alert("fin load!")
+      //document.getElementsByName("resultext")[0].value=reader.result;
+      //document.getElementsByName("resultext").value=reader.result;
+    }
+  }
+
+  function convert(jsondata, mag) {
+    console.log(jsondata);
+    var tempdata = {
+      "format_version": "1.12.0",
+      "minecraft:geometry": [
+        {
+          "description": {
+            "identifier": "geometry.geometry.humanoid",
+            "texture_width": 64,
+            "texture_height": 64,
+            "visible_bounds_width": 3,
+            "visible_bounds_height": 4,
+            "visible_bounds_offset": [0, 0, 0]
+          },
+          "bones": [
+            {
+              "name": "unknown_bone",
+              "pivot": [0, 0, 0],
+              "cubes": [
+              ]
+            }
+          ]
+        }
+      ]
+    }
+
+    var cubes = [];
+
+    for (let t of jsondata["voxels"]) {
+      cubes.push({ "origin": [(t["x"] - jsondata["dimension"][0]["width"] / 2) * mag, (t["y"]) * mag, (t["z"] - jsondata["dimension"][0]["depth"] / 2) * mag], "size": [1 * mag, 1 * mag, 1 * mag], "uv": [0, 0] });
+    }
+
+    tempdata["minecraft:geometry"][0]["bones"][0]["cubes"] = cubes;
+
+    tempdata["minecraft:geometry"][0]["bones"][0]["pivot"] = [0, 0, 0]
+
+    //console.log(JSON.stringify(tempdata, null, ' '))
+    let masterData2 = JSON.stringify(tempdata);
+
+    let blob = new Blob([masterData2], { type: "application/json" });
+    let link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'model.json';
+    link.click();
+    console.log(mag * 200);
+  }
+
+  function convert3(jsondata, mag) {
+    console.log(jsondata);
+    var tempdata = {
+      "format_version": "1.12.0",
+      "minecraft:geometry": [
+        {
+          "description": {
+            "identifier": "geometry.geometry.humanoid",
+            "texture_width": 64,
+            "texture_height": 64,
+            "visible_bounds_width": 3,
+            "visible_bounds_height": 4,
+            "visible_bounds_offset": [0, 0, 0]
+          },
+          "bones": [
+            {
+              "name": "unknown_bone",
+              "pivot": [0, 0, 0],
+              "cubes": [
+              ]
+            }
+          ]
+        }
+      ]
+    }
+    
+    let width=Number(jsondata["dimension"][0]["width"])+1;
+    let height=Number(jsondata["dimension"][0]["height"])+1;
+    let depth=Number(jsondata["dimension"][0]["depth"])+1;
+
+    let xyzDspace = [...Array(width)].map(k=>[...Array(height)].map(k=>[...Array(depth)].map(k=>0)));
+    console.log(xyzDspace);
+ 
+    for (let t of jsondata["voxels"]) {
+      //console.log(t["x"]+","+t["y"]+","+t["z"]);
+      xyzDspace[Number(t["x"])][Number(t["y"])][Number(t["z"])]=1;
+    }
+
+    var cubes = [];
+
+    var pulesscounts=[];
+    for (let ix=0;ix<width;ix++){
+      for (let iy=0;iy<height;iy++){
+        for (let iz=0;iz<depth;iz++){
+          if(xyzDspace[ix][iy][iz]==0)continue
+          let t = getvestV(xyzDspace,ix,iy,iz,width,height,depth);
+          for(let i=0;i<t[0];i++){
+            xyzDspace[ix+t[1][0]*(i+1)][iy+t[1][1]*(i+1)][iz+t[1][2]*(i+1)]=0;
+          }
+          pulesscounts.push(t[0]);
+          cubes.push({"origin":[ix*mag,iy*mag,iz*mag], "size": [1+t[1][0]*t[0]*mag, 1+t[1][1]*t[0]*mag, 1+t[1][2]*t[0]*mag], "uv": [0, 0] })
+        }
+      }
+    }
+    pulesscounts.sort(function(a,b){
+        if( a > b ) return -1;
+        if( a < b ) return 1;
+        return 0;
+    })
+    console.log(pulesscounts);
+    console.log(cubes);
+
+    tempdata["minecraft:geometry"][0]["bones"][0]["cubes"] = cubes;
+
+    tempdata["minecraft:geometry"][0]["bones"][0]["pivot"] = [0, 0, 0]
+
+    //console.log(JSON.stringify(tempdata, null, ' '))
+    let masterData2 = JSON.stringify(tempdata);
+
+    let blob = new Blob([masterData2], { type: "application/json" });
+    let link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'model.json';
+    link.click();
+    console.log(mag * 200);
+
+  }
+
+  function getvestV(xyzDspace,x,y,z,w,h,d){
+    let vecs = [
+      [1,0,0],
+      [-1,0,0],
+      [0,1,0],
+      [0,-1,0],
+      [0,0,1],
+      [0,0,-1]
+    ]
+    let lens=[];
+    for(let t of vecs){
+      lens.push([getVlength(xyzDspace,x,y,z,t[0],t[1],t[2],w,h,d),t]);
+    }
+    lens.sort(function(a,b){
+        if( a > b ) return -1;
+        if( a < b ) return 1;
+        return 0;
+    })
+    return lens[0];
+  }
+
+  function getVlength(xyzDspace,x,y,z,xv,yv,zv,w,h,d){
+    let t=0;
+    while(w>x&&h>y&&d>z&&0<=x&&0<=y&&0<=z&&xyzDspace[x][y][z]==1){
+      t++;
+      x+=xv;
+      y+=yv;
+      z+=zv;
+    }
+    return t-1;
+  }
+
+  function convert2(jsondata, mag,data) {
+    console.log(jsondata);
+    
+    for (let t of jsondata["voxels"]) {
+      //cubes.push({ "origin": [(t["x"] - jsondata["dimension"][0]["width"] / 2) * mag, (t["y"]) * mag, (t["z"] - jsondata["dimension"][0]["depth"] / 2) * mag], "size": [1 * mag, 1 * mag, 1 * mag], "uv": [0, 0] });
+
+      data+="BOX:BODY "+(t["x"] - jsondata["dimension"][0]["width"] / 2) * mag+ " " + (t["y"]) * -mag + " " +(t["z"] - jsondata["dimension"][0]["depth"] / 2) * mag+ " " +1 + " " +1 + " " +1 +" 0 0\n"
+    }
+
+    //tempdata["minecraft:geometry"][0]["bones"][0]["cubes"] = cubes;
+
+    //tempdata["minecraft:geometry"][0]["bones"][0]["pivot"] = [0, 0, 0]
+
+    //console.log(JSON.stringify(tempdata, null, ' '))
+    //let masterData2 = JSON.stringify(tempdata);
+
+    let blob = new Blob([data], { type: "text/plain" });
+    let link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = "dlcskin"+document.getElementsByName("DISPLAYNAMEID")[0].value+'.png.txt';
+    link.click();
+  }
+
+  function convert4(jsondata, mag,data) {
+    console.log(jsondata);
+
+    let width=Number(jsondata["dimension"][0]["width"])+1;
+    let height=Number(jsondata["dimension"][0]["height"])+1;
+    let depth=Number(jsondata["dimension"][0]["depth"])+1;
+
+    let xyzDspace = [...Array(width)].map(k=>[...Array(height)].map(k=>[...Array(depth)].map(k=>0)));
+    console.log(xyzDspace);
+ 
+    for (let t of jsondata["voxels"]) {
+      //console.log(t["x"]+","+t["y"]+","+t["z"]);
+      xyzDspace[Number(t["x"])][Number(t["y"])][Number(t["z"])]=1;
+    }
+
+    var cubes = [];
+
+    var pulesscounts=[];
+    for (let ix=0;ix<width;ix++){
+      for (let iy=0;iy<height;iy++){
+        for (let iz=0;iz<depth;iz++){
+          if(xyzDspace[ix][iy][iz]==0)continue
+          let t = getvestV(xyzDspace,ix,iy,iz,width,height,depth);
+          for(let i=0;i<t[0];i++){
+            xyzDspace[ix+t[1][0]*(i+1)][iy+t[1][1]*(i+1)][iz+t[1][2]*(i+1)]=0;
+          }
+          pulesscounts.push(t[0]);
+          cubes.push({"origin":[ix*mag,iy*mag,iz*mag], "size": [1+t[1][0]*t[0]*mag, 1+t[1][1]*t[0]*mag, 1+t[1][2]*t[0]*mag], "uv": [0, 0] })
+          data+="BOX:BODY "+(ix-width/2) * mag+ " " + (iy) * -mag + " " +(iz-depth/2) * mag+ " " +(1+t[1][0]*t[0]*mag) + " " +(1+t[1][1]*t[0]*mag) + " " +(1+t[1][2]*t[0]*mag) +" 0 0\n"
+        }
+      }
+    }
+
+    pulesscounts.sort(function(a,b){
+        if( a > b ) return -1;
+        if( a < b ) return 1;
+        return 0;
+    })
+    console.log(pulesscounts);
+    console.log(cubes);
+
+    let blob = new Blob([data], { type: "text/plain" });
+    let link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = "dlcskin"+document.getElementsByName("DISPLAYNAMEID")[0].value+'.png.txt';
+    link.click();
+
+  }
+
+
+  function RUNbutton() {
+    var rcheck = document.formChecker.rbtn[0].checked; //ラジオボタンrbtnの１つ目（rbtn[0]）の状態を取得
+    if (rcheck) {
+      console.log("start convert");
+
+      const reader = new FileReader();
+      let file = finp.files[0];
+      reader.readAsText(file);
+
+      reader.onload = function () {
+        console.log(reader.result);
+        const jsonObject = JSON.parse(reader.result);
+        console.log(mag.value / 100);
+        convert3(jsonObject, Number(mag.value / 100));
+      }
+    }else{
+      console.log("start convert2");
+
+      const reader = new FileReader();
+      let file = finp.files[0];
+      reader.readAsText(file);
+
+      reader.onload = function () {
+        console.log(reader.result);
+        const jsonObject = JSON.parse(reader.result);
+        console.log(mag.value / 100);
+        let data ="";
+        
+        data+="DISPLAYNAME:"+document.getElementsByName("DISPLAYNAME")[0].value+"\n";
+        data+="DISPLAYNAMEID:IDS_dlcskin"+document.getElementsByName("DISPLAYNAMEID")[0].value+"_DISPLAYNAME\n";
+        data+="THEMENAME:"+document.getElementsByName("THEMENAME")[0].value+"\n";
+        data+="GAME_FLAGS:"+document.getElementsByName("GAME_FLAGS")[0].value+"\n";
+        data+="FREE:"+document.getElementsByName("FREE")[0].value+"\n";
+        data+="ANIM:"+document.getElementsByName("ANIM")[0].value+"\n";
+
+
+        console.log(data)
+        convert4(jsonObject, Number(mag.value / 100),data);
+      }
+    }
+
+  }
+</script>
+
+</html>
