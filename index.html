@@ -8,7 +8,8 @@
   <title>Voxel Convertor</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
 </head>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.3/react.js"></script>
+<script src="block_color.js"></script>
 
 <body>
   <style>
@@ -482,9 +483,17 @@
 
     let xyzDspace = [...Array(width)].map(k => [...Array(height)].map(k => [...Array(depth)].map(k => 0)));
 
+    let block_col = new block_color();
+
     for (let t of jsondata["voxels"]) {
       //console.log(t["x"]+","+t["y"]+","+t["z"]);
-      xyzDspace[Number(t["x"])][Number(t["y"])][Number(t["z"])] = 1;
+      if(t["red"]!=null){
+        let result = block_col.getneirestblock(t["red"],t["green"],t["blue"]);
+        xyzDspace[Number(t["x"])][Number(t["y"])][Number(t["z"])] = [1,result[0],result[1]];
+      }else{
+        xyzDspace[Number(t["x"])][Number(t["y"])][Number(t["z"])] = [1,1,0];
+      }
+      
     }
 
     let vecs = [
@@ -501,32 +510,35 @@
     for (let ix = 0; ix < width; ix++) {
       for (let iy = 0; iy < height; iy++) {
         for (let iz = 0; iz < depth; iz++) {
-          if (xyzDspace[ix][iy][iz] == 0) continue
+          if (xyzDspace[ix][iy][iz][0] == 0) continue
 
           let cou = 0;
+
+
           if (ix - 1 > 0 && iy - 1 > 0 && iz - 1 > 0 && ix + 1 < width && iy + 1 < height && iz + 1 < depth) {
             for (let t of vecs) {
-              if (xyzDspace[ix + t[0]][iy + t[1]][iz + t[2]] != 0) cou++;
+              if (xyzDspace[ix + t[0]][iy + t[1]][iz + t[2]][0] != 0) cou++;
             }
           }
 
           if (cou == 6) {
-            xyzDspace[ix][iy][iz] = 2;
-          }
+            xyzDspace[ix][iy][iz][0] = 2;
 
-          if (xyzDspace[ix][iy][iz] == 1) {
-            poslist.push([ix, iy, iz]);
+          }
+          console.log(cou);
+          if (xyzDspace[ix][iy][iz][0] == 1) {
+            poslist.push([ix, iy, iz,xyzDspace[ix][iy][iz][1],xyzDspace[ix][iy][iz][2]]);
           }
         }
       }
     }
 
-    let buffer = new ArrayBuffer(0x20 + poslist.length * 6);
+    let buffer = new ArrayBuffer(0x20 + poslist.length * 10);
 
     let dv = new DataView(buffer);
     poslist.sort(function (a, b) {
-      if (a[0]**2+a[1]**2+a[2]**2 > b[0]**2+b[1]**2+b[2]**2) return 1;
-      if (a[0]**2+a[1]**2+a[2]**2 < b[0]**2+b[1]**2+b[2]**2) return -1;
+      if (a[1] > b[1]) return 1;
+      if (a[1] < b[1]) return -1;
       return 0;
     })
     console.log(poslist.length);
@@ -534,9 +546,11 @@
     dv.setUint32(0x4, poslist.length);
 
     for (let i = 0; i < poslist.length; i++) {
-      dv.setUint16(0x20 + i * 6, poslist[i][0]);
-      dv.setUint16(0x22 + i * 6, poslist[i][1]);
-      dv.setUint16(0x24 + i * 6, poslist[i][2]);
+      dv.setUint16(0x20 + i * 10, poslist[i][0]);
+      dv.setUint16(0x22 + i * 10, poslist[i][1]);
+      dv.setUint16(0x24 + i * 10, poslist[i][2]);
+      dv.setUint16(0x26 + i * 10, poslist[i][3]);
+      dv.setUint16(0x28 + i * 10, poslist[i][4]);
     }
 
     var a = document.createElement("a");
